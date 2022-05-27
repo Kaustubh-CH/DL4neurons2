@@ -276,6 +276,9 @@ def lock_params(args, paramsets):
 
 
 def main(args):
+    
+    #Gets all the parameters and creates the model
+    
     print(args)
     if args.trivial_parallel and args.outfile and '{NODEID}' in args.outfile:
         args.outfile = args.outfile.replace('{NODEID}', os.environ['SLURM_PROCID'])
@@ -359,6 +362,8 @@ def main(args):
     buf_vs = np.zeros(shape=(stop-start, len(stim), model._n_rec_pts(),len(args.stim_file)), dtype=np.float32)
     buf_stims = np.zeros(shape=(stop-start, 2,len(args.stim_file)), dtype=np.float32)
     print('dd',type(paramsets),paramsets.shape)
+    
+    #
     for iSamp, params in enumerate(paramsets):
         
         if args.print_every and iSamp % args.print_every == 0:
@@ -412,14 +417,20 @@ if __name__ == '__main__':
         cells = json.load(infile)
         ALL_MTYPES = cells.keys()
         ALL_ETYPES = list(set(itertools.chain.from_iterable(mtype.keys() for mtype in cells.values())))
-
+    #Selecting the NEURON Model
     parser.add_argument('--model', choices=MODELS_BY_NAME.keys(),
                         default='hh_ball_stick_7param')
+    #"L1_NGC-SA" Model types 
     parser.add_argument('--m-type', choices=ALL_MTYPES, required=False, default=None)
+    #bNAC and cNAC prameters from cell.json
     parser.add_argument('--e-type', choices=ALL_ETYPES, required=False, default=None)
+    #Cell i?
     parser.add_argument('--cell-i', type=int, required=False, default=0)
+    
     parser.add_argument('--cori-start', type=int, required=False, default=None, help='start cell')
     parser.add_argument('--cori-end', type=int, required=False, default=None, help='end cell')
+    
+    #From where are we getting the csv?
     parser.add_argument('--cori-csv', type=str, required=False, default=None,
                         help='When running BBP on cori, use SLURM_PROCID to compute m-type and e-type from the given cells csv')
     
